@@ -19,11 +19,8 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
     
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var dataTableColumn: NSTableColumn!
-    
     @IBOutlet weak var graphView: GraphView!
-    
     @IBOutlet weak var statePopUp: NSPopUpButton!
-    
     @IBOutlet weak var subjectPopUp: NSPopUpButton!
     
     var subject = GraphSubject.newCases
@@ -55,8 +52,11 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
         tableView.dataSource = self
         
         requestStateInfo()
+        
+        let defaults = UserDefaults.standard
+        let currentName = defaults.string(forKey: "currentName") as String? ?? "AZ"
 
-        historicValuesForState(state: "AZ")
+        getValuesFor(name: currentName)
     }
 
 
@@ -266,12 +266,24 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
     @IBAction func selectionUpdate(_ sender: NSPopUpButton) {
         let i = sender.indexOfSelectedItem
         if i == 0 {
+            getValuesFor(name: "United States")
+        }
+        else {
+            let stateObject = states[i-1]
+            getValuesFor(name: stateObject.state)
+        }
+    }
+    
+    
+    func getValuesFor(name: String) {
+        if name == "United States" {
             historicValuesForUS()
         }
         else {
-            let s = states[i-1]
-            historicValuesForState(state: s.state)
+            historicValuesForState(state: name)
         }
+        let defaults = UserDefaults.standard
+        defaults.set(name, forKey: "currentName")
     }
     
     
@@ -393,7 +405,12 @@ class ViewController: NSViewController, NSTableViewDelegate, NSTableViewDataSour
             statePopUp.addItem(withTitle: s.name)
         }
         
-        statePopUp.selectItem(withTitle: "Arizona")
+        let defaults = UserDefaults.standard
+        let currentName = defaults.string(forKey: "currentName") as String? ?? "AZ"
+        if let stateObject = states.first(where: { $0.state == currentName }) {
+            statePopUp.selectItem(withTitle: stateObject.name)
+        }
+        
     }
 
 

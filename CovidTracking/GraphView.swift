@@ -166,6 +166,7 @@ class GraphView: NSView {
         CTFrameDraw(textFrame, cg)
     }
     
+    
     func horizontalLabels() {
         guard let context = NSGraphicsContext.current else { return }
         let cg = context.cgContext
